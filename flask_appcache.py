@@ -9,8 +9,8 @@ class Appcache(object):
   def __init__(self, app=None):
     self.app = app
     self._get_contents = []
-    self._urls = []
-    self._excluded_urls = []
+    self._urls = set()
+    self._excluded_urls = set()
     self._lasthash = None
     self._lastupdated = None
 
@@ -23,8 +23,6 @@ class Appcache(object):
     app.config.setdefault("APPCACHE_TEMPLATE", "manifest.appcache")
     app.config.setdefault("APPCACHE_URL", "/manifest.appcache")
     app.config.setdefault("APPCACHE_URL_BASE", "http://localhost")
-    app.config.setdefault("CACHED_URLS", [])
-    app.config.setdefault("EXCLUDED_URLS", [])
 
     def after_request(resp):
       resp.cache_control.must_revalidate = True
@@ -42,10 +40,6 @@ class Appcache(object):
 
       response.mimetype = 'text/cache-manifest'
       return response
-
-    self._excluded_urls = set()
-    self.add_excluded_urls(*app.config["EXCLUDED_URLS"])
-    self.add_urls(*app.config["CACHED_URLS"])
 
   def urls(self):
     return self._urls
@@ -79,9 +73,6 @@ class Appcache(object):
 
   def add_urls(self, *urls):
     for url in urls:
-      if url in self._urls:
-        continue
-
       skip = False
       for u in self._excluded_urls:
         if url.startswith(u):
@@ -107,8 +98,4 @@ class Appcache(object):
         return response.data
 
       self._get_contents.append(get_content)
-      self._urls.append(url)
-
-  def reset(self):
-    self._urls = []
-    self._get_contents = []
+      self._urls.add(url)

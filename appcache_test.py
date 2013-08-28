@@ -18,8 +18,6 @@ class AppcacheTest(unittest.TestCase):
     self.assertEquals("manifest.appcache", app.config["APPCACHE_TEMPLATE"])
     self.assertEquals("/manifest.appcache", app.config["APPCACHE_URL"])
     self.assertEquals("http://localhost", app.config["APPCACHE_URL_BASE"])
-    self.assertEquals([], app.config["CACHED_URLS"])
-    self.assertEquals([], app.config["EXCLUDED_URLS"])
 
     app = Flask(__name__)
     appcache = Appcache()
@@ -28,8 +26,6 @@ class AppcacheTest(unittest.TestCase):
     self.assertEquals("manifest.appcache", app.config["APPCACHE_TEMPLATE"])
     self.assertEquals("/manifest.appcache", app.config["APPCACHE_URL"])
     self.assertEquals("http://localhost", app.config["APPCACHE_URL_BASE"])
-    self.assertEquals([], app.config["CACHED_URLS"])
-    self.assertEquals([], app.config["EXCLUDED_URLS"])
 
     app = Flask(__name__)
     app.config["APPCACHE_URL"] = "/yay/manifest.appcache"
