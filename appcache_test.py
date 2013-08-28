@@ -82,6 +82,26 @@ class AppcacheTest(unittest.TestCase):
     self.assertTrue("/media/static1.js" in urls)
     self.assertTrue("/media/static2.css" in urls)
 
+  def test_excluded_urls(self):
+    app = Flask(__name__)
+    appcache = Appcache(app)
+
+    appcache.add_excluded_urls("/static/develop")
+    appcache.add_urls("/static/develop/js.js")
+    self.assertEquals(0, len(appcache.urls()))
+
+    appcache.add_urls("/static/js.js")
+    self.assertEquals(1, len(appcache.urls()))
+
+    app = Flask(__name__)
+    appcache = Appcache(app)
+
+    appcache.add_excluded_urls("/static/ignored")
+    appcache.add_folder("test_ignore", base="/static")
+    urls = list(appcache.urls())
+    self.assertEquals(1, len(urls))
+    self.assertEquals("/static/not_ignored", urls[0])
+
   def test_all_together(self):
     app = Flask(__name__)
     appcache = Appcache(app)
