@@ -34,7 +34,7 @@ Here's server.py:
 
     # adds some urls to cache.
     appcache.add_urls("/", "/offline")
-    appcache.add_folder("static", base="/static") 
+    appcache.add_folder("static", base="/static")
 
     @app.route("/")
     def main():
@@ -48,7 +48,7 @@ Here's an example manifest.appcache file (actually this is probably good for
 most purposes):
 
     CACHE MANIFEST
-    # version {{ hash }} 
+    # version {{ hash }}
     # updated {{ updated }}
 
     CACHE:
@@ -159,3 +159,72 @@ Here's an example deployment configuration to be put in place in server.py:
     if not app.debug:
       # precomputes the hashes and stays there
       appcache.finalize()
+
+API
+---
+
+Help on module flask_appcache:
+
+    NAME
+        flask_appcache
+
+    CLASSES
+        __builtin__.object
+            Appcache
+
+        class Appcache(__builtin__.object)
+         |  Methods defined here:
+         |
+         |  __init__(self, app=None)
+         |      Initializes a new instance of Appcache
+         |
+         |  add_excluded_urls(self, *urls)
+         |      Adds urls to exclude from appcache.
+         |
+         |      Args:
+         |        urls: the urls to cache
+         |
+         |  add_folder(self, folder, base='/static')
+         |      Adds a whole folder to appcache.
+         |
+         |      Args:
+         |        folder: the folder's content to cache.
+         |        base: The base url.
+         |
+         |        As an example, if you have media/ being your static dir and that is
+         |        mapped to the server url of /static, you would do
+         |        add_folder('media', base='/static')
+         |
+         |  add_urls(self, *urls)
+         |      Adds individual urls on appcache.
+         |
+         |      Args:
+         |        urls: The urls to be appcached.
+         |
+         |  finalize(self)
+         |      Finalizes the appcache by precomputing the hash.
+         |
+         |      This will cause the hash() function to never compute the hash again.
+         |
+         |  hash(self)
+         |      Computes the hash and the last updated time for the current appcache
+         |
+         |      Returns:
+         |        hash, time updated in isoformat
+         |
+         |  init_app(self, app)
+         |      Initializes the app.
+         |
+         |      Warning: set all the config variables before this so the correct route will
+         |      be registered.
+         |
+         |  ----------------------------------------------------------------------
+         |  Data descriptors defined here:
+         |
+         |  __dict__
+         |      dictionary for instance variables (if defined)
+         |
+         |  __weakref__
+         |      list of weak references to the object (if defined)
+
+

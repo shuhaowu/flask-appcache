@@ -7,6 +7,7 @@ from flask import make_response, render_template
 
 class Appcache(object):
   def __init__(self, app=None):
+    """Initializes a new instance of Appcache"""
     self.app = app
     self.urls = set()
     self._get_contents = []
@@ -19,6 +20,12 @@ class Appcache(object):
       self.init_app(app)
 
   def init_app(self, app):
+    """Initializes the app.
+
+    Warning: set all the config variables before this so the correct route will
+    be registered.
+    """
+
     if self.app is None:
       self.app = app
     app.config.setdefault("APPCACHE_TEMPLATE", "manifest.appcache")
@@ -43,6 +50,11 @@ class Appcache(object):
       return response
 
   def hash(self):
+    """Computes the hash and the last updated time for the current appcache
+
+    Returns:
+      hash, time updated in isoformat
+    """
     if not self._finalized:
       file_hashes = hashlib.sha1()
       for f in self._get_contents:
@@ -57,6 +69,10 @@ class Appcache(object):
     return self._lasthash, self._lastupdated
 
   def finalize(self):
+    """Finalizes the appcache by precomputing the hash.
+
+    This will cause the hash() function to never compute the hash again."""
+
     # to compute the hash
     self.hash()
     self._finalized = True
@@ -66,12 +82,27 @@ class Appcache(object):
       raise RuntimeError("Appcache has already been finalized.")
 
   def add_excluded_urls(self, *urls):
+    """Adds urls to exclude from appcache.
+
+    Args:
+      urls: the urls to cache
+    """
     self._check_finalized()
 
     for url in urls:
       self._excluded_urls.add(url)
 
   def add_folder(self, folder, base="/static"):
+    """Adds a whole folder to appcache.
+
+    Args:
+      folder: the folder's content to cache.
+      base: The base url.
+
+      As an example, if you have media/ being your static dir and that is
+      mapped to the server url of /static, you would do
+      add_folder('media', base='/static')
+    """
     l = len(folder)
     for root, subdir, fname in os.walk(folder):
       # we want the path that's inside the folder.
@@ -82,6 +113,11 @@ class Appcache(object):
         self.add_urls(path)
 
   def add_urls(self, *urls):
+    """Adds individual urls on appcache.
+
+    Args:
+      urls: The urls to be appcached.
+    """
     self._check_finalized()
 
     for url in urls:
