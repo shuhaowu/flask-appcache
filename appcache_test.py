@@ -59,7 +59,7 @@ class AppcacheTest(unittest.TestCase):
     appcache = Appcache(app)
 
     appcache.add_urls("/")
-    self.assertTrue("/" in appcache.urls())
+    self.assertTrue("/" in appcache.urls)
 
   def test_add_folders(self):
     app = Flask(__name__)
@@ -67,7 +67,7 @@ class AppcacheTest(unittest.TestCase):
 
     appcache.add_folder("static", base="/static")
 
-    urls = appcache.urls()
+    urls = appcache.urls
     self.assertEquals(2, len(urls))
     self.assertTrue("/static/static1.js" in urls)
     self.assertTrue("/static/static2.css" in urls)
@@ -77,7 +77,7 @@ class AppcacheTest(unittest.TestCase):
 
     appcache.add_folder("static", base="/media")
 
-    urls = appcache.urls()
+    urls = appcache.urls
     self.assertEquals(2, len(urls))
     self.assertTrue("/media/static1.js" in urls)
     self.assertTrue("/media/static2.css" in urls)
@@ -88,17 +88,17 @@ class AppcacheTest(unittest.TestCase):
 
     appcache.add_excluded_urls("/static/develop")
     appcache.add_urls("/static/develop/js.js")
-    self.assertEquals(0, len(appcache.urls()))
+    self.assertEquals(0, len(appcache.urls))
 
     appcache.add_urls("/static/js.js")
-    self.assertEquals(1, len(appcache.urls()))
+    self.assertEquals(1, len(appcache.urls))
 
     app = Flask(__name__)
     appcache = Appcache(app)
 
     appcache.add_excluded_urls("/static/ignored")
     appcache.add_folder("test_ignore", base="/static")
-    urls = list(appcache.urls())
+    urls = list(appcache.urls)
     self.assertEquals(1, len(urls))
     self.assertEquals("/static/not_ignored", urls[0])
 
@@ -118,7 +118,7 @@ class AppcacheTest(unittest.TestCase):
     def test():
         return "yay!!"
 
-    urls = appcache.urls()
+    urls = appcache.urls
     self.assertEquals(4, len(urls))
     self.assertTrue("/" in urls)
     self.assertTrue("/test" in urls)
@@ -169,3 +169,18 @@ class AppcacheTest(unittest.TestCase):
     self.assertEquals(4, len(data))
     self.assertEquals(hashlib.sha1("Test").hexdigest(), data[1])
     self.assertEquals("/static/static1.js", data[2])
+
+  def test_finalize(self):
+    app = Flask(__name__)
+    appcache = Appcache(app)
+    appcache.add_urls("/static/static1.js")
+    appcache.finalize()
+
+    with self.assertRaises(RuntimeError):
+        appcache.add_urls("/")
+
+    # these exists..
+    # should never be recomputed.
+    hash, updated = appcache.hash()
+    self.assertTrue(hash)
+    self.assertTrue(updated)

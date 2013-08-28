@@ -132,4 +132,30 @@ any url routes tracked by appcache.
 In order to compute the hash of the current site, Flask-Appcache makes a fake
 request to your server to retrieve the content of an appcache'd URL. This makes
 it play well with any view. Note, this view should not change often as it will
-screw up appcache updates.
+screw up appcache updates. This happens everytime manifest.appcache is loaded
+in debug mode.
+
+Deployment considerations
+-------------------------
+
+As previously stated, everytime manifest.appcache is requested, the framework
+goes and hashes every copy of the file that needs to be appcached so it can
+hash it and check for changes. This would be slow. Luckily, there is a
+`finalize` method that precomputes the hashes.
+
+Here's an example deployment configuration to be put in place in server.py:
+
+    if app.debug:
+      # exclude urls associated with deployment
+      appcache.add_excluded_urls("/static/js/app.min.js",
+                                 "/static/css/app.min.css")
+    else:
+      # excludes all the urls associated with development
+      appcache.add_excluded_urls("/static/js/develop",
+                                 "/static/css/develop")
+
+    # adds all the static files
+    appcache.add_folder("static", base="/static")
+    if not app.debug:
+      # precomputes the hashes and stays there
+      appcache.finalize()

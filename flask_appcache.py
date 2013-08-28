@@ -8,11 +8,12 @@ from flask import make_response, render_template
 class Appcache(object):
   def __init__(self, app=None):
     self.app = app
+    self.urls = set()
     self._get_contents = []
-    self._urls = set()
     self._excluded_urls = set()
     self._lasthash = None
     self._lastupdated = None
+    self._finalized = False
 
     if app is not None:
       self.init_app(app)
@@ -33,7 +34,7 @@ class Appcache(object):
       hash, updated = self.hash()
       response = make_response(
         render_template(app.config["APPCACHE_TEMPLATE"],
-                        urls=self.urls(),
+                        urls=self.urls,
                         hash=hash,
                         updated=updated)
       )
@@ -41,23 +42,32 @@ class Appcache(object):
       response.mimetype = 'text/cache-manifest'
       return response
 
-  def urls(self):
-    return self._urls
-
   def hash(self):
-    file_hashes = hashlib.sha1()
-    for f in self._get_contents:
-      content = f()
-      file_hashes.update(content)
+    if not self._finalized:
+      file_hashes = hashlib.sha1()
+      for f in self._get_contents:
+        content = f()
+        file_hashes.update(content)
 
-    h = file_hashes.hexdigest()
-    if h != self._lasthash:
-      self._lasthash = h
-      self._lastupdated = datetime.now().isoformat()
+      h = file_hashes.hexdigest()
+      if h != self._lasthash:
+        self._lasthash = h
+        self._lastupdated = datetime.now().isoformat()
 
     return self._lasthash, self._lastupdated
 
+  def finalize(self):
+    # to compute the hash
+    self.hash()
+    self._finalized = True
+
+  def _check_finalized(self):
+    if self._finalized:
+      raise RuntimeError("Appcache has already been finalized.")
+
   def add_excluded_urls(self, *urls):
+    self._check_finalized()
+
     for url in urls:
       self._excluded_urls.add(url)
 
@@ -72,6 +82,8 @@ class Appcache(object):
         self.add_urls(path)
 
   def add_urls(self, *urls):
+    self._check_finalized()
+
     for url in urls:
       skip = False
       for u in self._excluded_urls:
@@ -98,4 +110,4 @@ class Appcache(object):
         return response.data
 
       self._get_contents.append(get_content)
-      self._urls.add(url)
+      self.urls.add(url)
