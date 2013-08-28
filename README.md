@@ -1,4 +1,6 @@
 flask-appcache
 ==============
 
-Appcache gave me too many headaches. Here's an extension to ease the pain.
+I've spent enough time tracking down appcache issues now.. Let's do this the
+right way.
+
