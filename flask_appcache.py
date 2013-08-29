@@ -32,8 +32,13 @@ class Appcache(object):
     app.config.setdefault("APPCACHE_URL", "/manifest.appcache")
     app.config.setdefault("APPCACHE_URL_BASE", "http://localhost")
 
+    @app.after_request
     def after_request(resp):
-      resp.cache_control.must_revalidate = True
+      if app.debug:
+        resp.cache_control.no_cache = True
+      else:
+        resp.cache_control.must_revalidate = True
+
       return resp
 
     @app.route(app.config["APPCACHE_URL"])

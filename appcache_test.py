@@ -184,3 +184,22 @@ class AppcacheTest(unittest.TestCase):
     hash, updated = appcache.hash()
     self.assertTrue(hash)
     self.assertTrue(updated)
+
+  def test_cache_control(self):
+    app = Flask(__name__)
+    app.config["DEBUG"] = True
+    appcache = Appcache(app)
+    appcache.add_urls("/static/static1.js")
+
+    client = app.test_client()
+    response = client.get("/static/static1.js", follow_redirects=True)
+    self.assertTrue("no-cache" in response.headers["Cache-Control"])
+
+    app = Flask(__name__)
+    app.config["DEBUG"] = False
+    appcache = Appcache(app)
+    appcache.add_urls("/static/static1.js")
+
+    client = app.test_client()
+    response = client.get("/static/static1.js", follow_redirects=True)
+    self.assertTrue("must-revalidate" in response.headers["Cache-Control"])
