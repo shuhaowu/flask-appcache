@@ -39,6 +39,8 @@ class Appcache(object):
       else:
         resp.cache_control.must_revalidate = True
 
+      resp.headers.remove("Expires")
+
       return resp
 
     @app.route(app.config["APPCACHE_URL"])

@@ -194,6 +194,7 @@ class AppcacheTest(unittest.TestCase):
     client = app.test_client()
     response = client.get("/static/static1.js", follow_redirects=True)
     self.assertTrue("no-cache" in response.headers["Cache-Control"])
+    self.assertTrue("Expires" not in response.headers)
 
     app = Flask(__name__)
     app.config["DEBUG"] = False
@@ -203,3 +204,4 @@ class AppcacheTest(unittest.TestCase):
     client = app.test_client()
     response = client.get("/static/static1.js", follow_redirects=True)
     self.assertTrue("must-revalidate" in response.headers["Cache-Control"])
+    self.assertTrue("Expires" not in response.headers)
