@@ -4,4 +4,4 @@ python:
   - "2.7"
 
 install: "pip install Flask"
-scripts: "python setup.py test"
+script: "python setup.py test"
