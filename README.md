@@ -4,7 +4,7 @@ flask-appcache
 I've spent enough time tracking down appcache issues now.. Let's do this the
 right way.
 
-[![Build Status](https://travis-ci.org/shuhaowu/flask_appcache.png)](https://travis-ci.org/shuhaowu/flask_appcache)
+[![Build Status](https://travis-ci.org/shuhaowu/flask-appcache.png)](https://travis-ci.org/shuhaowu/flask-appcache)
 
 
 Install
