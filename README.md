@@ -42,7 +42,7 @@ Here's server.py:
 
     # adds some urls to cache.
     appcache.add_urls("/", "/offline")
-    appcache.add_folder("static", base="/static")
+    appcache.add_folder("/absolute/path/is/recommended/static", base="/static")
 
     @app.route("/")
     def main():
@@ -57,6 +57,8 @@ most purposes):
 
     CACHE MANIFEST
     # version {{ hash }}
+    # It is recommended that you don't have the line below if you run multiple
+    # processes as they will each have a different time.
     # updated {{ updated }}
 
     CACHE:
@@ -75,6 +77,8 @@ this file:
 
     CACHE MANIFEST
     # version ab1a2034bc23a734015d18c06c4d29f2264d7a8e
+    # It is recommended that you don't have the line below if you run multiple
+    # processes as they will each have a different time.
     # updated 2013-08-28T15:16:34.663515
 
     CACHE:
